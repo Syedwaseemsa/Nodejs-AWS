@@ -1,0 +1,68 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the `main` branch
+  pull_request:
+    branches:
+      - main  # Trigger the workflow on pull requests to the `main` branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner for this job
+    
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
+      
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.15.1'  # Specify Node.js version 20.15.1
+      
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Run linting (if you have a lint script)
+      - name: Run linting
+        run: npm run lint
+        # Uncomment the line below if you have linting set up
+        # continue-on-error: true  # Optionally continue on lint errors if you don't want to fail the build
+
+      # Step 5: Run tests
+      - name: Run tests
+        run: npm test
+      
+      # Step 6: Build the project
+      - name: Build project
+        run: npm run build
+      
+      # Step 7: Upload test results to GitHub
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results.xml  # Assuming you save test results as test-results.xml
+
+      # Step 8: Upload coverage reports
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage  # Assuming you save coverage reports in the coverage directory
+
+      # Step 9: Notify if the build failed (Optional)
+      - name: Notify build failure
+        if: failure()
+        uses: appleboy/telegram-action@v1
+        with:
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+          text: 'Build failed! Check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+
