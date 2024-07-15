@@ -56,13 +56,3 @@ jobs:
         with:
           name: coverage-report
           path: coverage  # Assuming you save coverage reports in the coverage directory
-
-      # Step 9: Notify if the build failed (using updated action)
-      - name: Notify build failure
-        if: failure()
-        uses: ruocow/telegram-bot-action@v3  # Example version, update as needed
-        with:
-          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-          text: 'Build failed! Check the logs at ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-
