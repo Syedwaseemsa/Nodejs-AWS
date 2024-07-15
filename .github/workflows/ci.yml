@@ -24,35 +24,41 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.15.1'  # Specify Node.js version 20.15.1
-      
+
       # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: Run linting (if you have a lint script)
-      - name: Run linting
-        run: npm run lint
-        # Uncomment the line below if you have linting set up
-        # continue-on-error: true  # Optionally continue on lint errors if you don't want to fail the build
+      # Step 4: Ensure eslint permissions
+      - name: Ensure eslint permissions
+        run: chmod +x ./node_modules/.bin/eslint
 
-      # Step 5: Run tests
+      # Step 5: Verify ESLint installation
+      - name: Verify ESLint installation
+        run: npx eslint --version
+
+      # Step 6: Run linting
+      - name: Run lint
+        run: npm run lint  # Ensure that 'lint' script is defined in your package.json
+
+      # Step 7: Run tests
       - name: Run tests
-        run: npm test
-      
-      # Step 6: Build the project
+        run: npm test  # Ensure that 'test' script is defined in your package.json
+
+      # Step 8: Build the project
       - name: Build project
-        run: npm run build
-      
-      # Step 7: Upload test results to GitHub
+        run: npm run build  # Ensure that 'build' script is defined in your package.json
+
+      # Step 9: Upload test results to GitHub
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: test-results.xml  # Assuming you save test results as test-results.xml
+          path: test-results.xml  # Adjust the path if necessary
 
-      # Step 8: Upload coverage reports
+      # Step 10: Upload coverage reports
       - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
           name: coverage-report
-          path: coverage  # Assuming you save coverage reports in the coverage directory
+          path: coverage  # Adjust the path if necessary
